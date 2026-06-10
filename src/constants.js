@@ -22,6 +22,8 @@ export const CONSTANTS = {
   CLEARANCE_SCALE:       1,  // invisible outline-suppression zone scale
   GRASS_OUTLINE_GAP:     10.5,    // px tip separation before a blade edge is drawn
   GRASS_TIPS_ONLY:   true,   // draw only tip caps, no blade-edge outlines
+  GRASS_FADE_MS:      50,   // ms for a blade to fade in or out
+  TIP_VELOCITY_SCALE: 0.5, // alpha = clamp(|velocity| * scale, 0, 1)
 
   // Spring physics
   SPRING_STIFFNESS:   81.0,

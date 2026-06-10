@@ -10,6 +10,8 @@ const PARAMS = [
   { g: 'Grass',   k: 'GRASS_JITTER',           min: 0,       max: 10,    step: 0.5,     rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_OUTLINE_GAP',      min: 0,       max: 30,    step: 0.5 },
   { g: 'Grass',   k: 'GRASS_TIPS_ONLY',       type: 'bool' },
+  { g: 'Grass',   k: 'GRASS_FADE_MS',         min: 0,       max: 500,   step: 5 },
+  { g: 'Grass',   k: 'TIP_VELOCITY_SCALE',   min: 0,       max: 5,     step: 0.05 },
   { g: 'Physics', k: 'SPRING_STIFFNESS',       min: 1,       max: 200,   step: 1 },
   { g: 'Physics', k: 'SPRING_DAMPING',         min: 0,       max: 20,    step: 0.1 },
   { g: 'Physics', k: 'MAX_BLADE_ANGLE',        min: 0.1,     max: 3,     step: 0.05 },

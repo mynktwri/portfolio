@@ -2,6 +2,7 @@ import { Container, Graphics } from 'pixi.js';
 import { CONSTANTS as C } from './constants.js';
 
 const CLEARANCE_SIM_MARGIN = 4; // extra px around registered rects
+const ALPHA_BUCKETS = 8;        // number of alpha levels used for fade batching
 
 export class GrassField {
   constructor(app, wind) {
@@ -56,8 +57,8 @@ export class GrassField {
     this.rootY = new Float32Array(this.count);
     this.angle = new Float32Array(this.count);
     this.velocity = new Float32Array(this.count);
-    this.tipX   = new Float32Array(this.count);
-    this.active = new Uint8Array(this.count);
+    this.active      = new Uint8Array(this.count);
+    this._buckets    = Array.from({ length: ALPHA_BUCKETS }, () => []);
 
     const j = C.GRASS_JITTER;
     for (let r = 0; r < rows; r++) {
@@ -191,54 +192,35 @@ export class GrassField {
   draw() {
     const g = this.g;
     const H = C.BLADE_HEIGHT;
-    const baseHW = C.BLADE_BASE_WIDTH / 2;
     const tipHW = C.BLADE_TIP_WIDTH / 2;
-    // a packed field reads as a solid mass: an edge is drawn only when wind,
-    // jitter, or a clearance gap separates the tips by more than this
-    const outlineGap = C.GRASS_OUTLINE_GAP;
-    const tipsOnly = C.GRASS_TIPS_ONLY;
-    const cols = this.cols;
-
-    g.clear();
-
-    for (let i = 0; i < this.count; i++) {
-      this.tipX[i] = this.rootX[i] + Math.sin(this.angle[i]) * H;
-    }
+    // assign each moving blade to an alpha bucket for batched strokes
+    for (let b = 0; b < ALPHA_BUCKETS; b++) this._buckets[b].length = 0;
 
     for (let i = 0; i < this.count; i++) {
       if (!this.active[i]) continue;
-
-      const col = i % cols;
-      const leftVisible = col > 0 && (!this.active[i - 1]
-        || this.tipX[i] - this.tipX[i - 1] >= outlineGap);
-      const rightVisible = col < cols - 1 && (!this.active[i + 1]
-        || this.tipX[i + 1] - this.tipX[i] >= outlineGap);
-      // fully embedded in the mass — invisible
-      if (!leftVisible && !rightVisible) continue;
-
-      const cos = Math.cos(this.angle[i]);
-      const sin = Math.sin(this.angle[i]);
-      const rx = this.rootX[i];
-      const ry = this.rootY[i];
-      const tlx = Math.round(rx - tipHW * cos + H * sin);
-      const tly = Math.round(ry - tipHW * sin - H * cos);
-      const trx = Math.round(rx + tipHW * cos + H * sin);
-      const try_ = Math.round(ry + tipHW * sin - H * cos);
-
-      if (!tipsOnly) {
-        if (leftVisible) {
-          const blx = Math.round(rx - baseHW * cos);
-          const bly = Math.round(ry - baseHW * sin);
-          g.moveTo(blx, bly).lineTo(tlx, tly);
-        }
-        if (rightVisible) {
-          const brx = Math.round(rx + baseHW * cos);
-          const bry = Math.round(ry + baseHW * sin);
-          g.moveTo(brx, bry).lineTo(trx, try_);
-        }
-      }
-      g.moveTo(tlx, tly).lineTo(trx, try_); // tip cap always drawn on exposed blades
+      const alpha = Math.min(1.0, Math.abs(this.velocity[i]) * C.TIP_VELOCITY_SCALE);
+      if (alpha <= 0) continue;
+      this._buckets[Math.min(ALPHA_BUCKETS - 1, Math.floor(alpha * ALPHA_BUCKETS))].push(i);
     }
-    g.stroke({ width: 1, color: C.FG_TONE, pixelLine: true });
+
+    g.clear();
+    for (let b = 0; b < ALPHA_BUCKETS; b++) {
+      const bucket = this._buckets[b];
+      if (bucket.length === 0) continue;
+
+      for (let j = 0; j < bucket.length; j++) {
+        const i = bucket[j];
+        const cos = Math.cos(this.angle[i]);
+        const sin = Math.sin(this.angle[i]);
+        const rx = this.rootX[i];
+        const ry = this.rootY[i];
+        const tlx = Math.round(rx - tipHW * cos + H * sin);
+        const tly = Math.round(ry - tipHW * sin - H * cos);
+        const trx = Math.round(rx + tipHW * cos + H * sin);
+        const try_ = Math.round(ry + tipHW * sin - H * cos);
+        g.moveTo(tlx, tly).lineTo(trx, try_);
+      }
+      g.stroke({ width: 1, color: C.FG_TONE, alpha: (b + 1) / ALPHA_BUCKETS, pixelLine: true });
+    }
   }
 }
