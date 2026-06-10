@@ -100,8 +100,26 @@ export class DebugPanel {
       transition: 'transform 0.18s ease',
       boxSizing:  'border-box',
       padding:    '10px 10px 48px',
+      position:   'relative',
       borderLeft: '1px solid #8a7f5c55',
     });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    Object.assign(closeBtn.style, {
+      position:   'absolute',
+      top:        '8px',
+      right:      '10px',
+      background: 'none',
+      border:     'none',
+      color:      '#8a7f5c',
+      fontSize:   '14px',
+      cursor:     'pointer',
+      lineHeight: '1',
+      padding:    '2px 4px',
+    });
+    closeBtn.addEventListener('click', () => this._toggle());
+    panel.appendChild(closeBtn);
 
     let currentGroup = null;
     for (const p of PARAMS) {
