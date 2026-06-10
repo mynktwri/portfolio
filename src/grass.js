@@ -209,10 +209,10 @@ export class GrassField {
       if (!this.active[i]) continue;
 
       const col = i % cols;
-      const leftVisible = col === 0 || !this.active[i - 1]
-        || this.tipX[i] - this.tipX[i - 1] >= outlineGap;
-      const rightVisible = col === cols - 1 || !this.active[i + 1]
-        || this.tipX[i + 1] - this.tipX[i] >= outlineGap;
+      const leftVisible = col > 0 && (!this.active[i - 1]
+        || this.tipX[i] - this.tipX[i - 1] >= outlineGap);
+      const rightVisible = col < cols - 1 && (!this.active[i + 1]
+        || this.tipX[i + 1] - this.tipX[i] >= outlineGap);
       // fully embedded in the mass — invisible
       if (!leftVisible && !rightVisible) continue;
 
