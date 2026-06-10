@@ -56,7 +56,7 @@ export class GrassField {
     this.rootY = new Float32Array(this.count);
     this.angle = new Float32Array(this.count);
     this.velocity = new Float32Array(this.count);
-    this.tipX = new Float32Array(this.count);
+    this.tipX   = new Float32Array(this.count);
     this.active = new Uint8Array(this.count);
 
     const j = C.GRASS_JITTER;
@@ -196,6 +196,7 @@ export class GrassField {
     // a packed field reads as a solid mass: an edge is drawn only when wind,
     // jitter, or a clearance gap separates the tips by more than this
     const outlineGap = C.GRASS_OUTLINE_GAP;
+    const tipsOnly = C.GRASS_TIPS_ONLY;
     const cols = this.cols;
 
     g.clear();
@@ -224,17 +225,19 @@ export class GrassField {
       const trx = Math.round(rx + tipHW * cos + H * sin);
       const try_ = Math.round(ry + tipHW * sin - H * cos);
 
-      if (leftVisible) {
-        const blx = Math.round(rx - baseHW * cos);
-        const bly = Math.round(ry - baseHW * sin);
-        g.moveTo(blx, bly).lineTo(tlx, tly);
+      if (!tipsOnly) {
+        if (leftVisible) {
+          const blx = Math.round(rx - baseHW * cos);
+          const bly = Math.round(ry - baseHW * sin);
+          g.moveTo(blx, bly).lineTo(tlx, tly);
+        }
+        if (rightVisible) {
+          const brx = Math.round(rx + baseHW * cos);
+          const bry = Math.round(ry + baseHW * sin);
+          g.moveTo(brx, bry).lineTo(trx, try_);
+        }
       }
-      if (rightVisible) {
-        const brx = Math.round(rx + baseHW * cos);
-        const bry = Math.round(ry + baseHW * sin);
-        g.moveTo(brx, bry).lineTo(trx, try_);
-      }
-      g.moveTo(tlx, tly).lineTo(trx, try_); // tip cap on exposed blades
+      g.moveTo(tlx, tly).lineTo(trx, try_); // tip cap always drawn on exposed blades
     }
     g.stroke({ width: 1, color: C.FG_TONE, pixelLine: true });
   }

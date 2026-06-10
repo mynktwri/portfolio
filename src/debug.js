@@ -9,6 +9,7 @@ const PARAMS = [
   { g: 'Grass',   k: 'GRASS_ROW_SPACING',      min: 3,       max: 30,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_JITTER',           min: 0,       max: 10,    step: 0.5,     rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_OUTLINE_GAP',      min: 0,       max: 30,    step: 0.5 },
+  { g: 'Grass',   k: 'GRASS_TIPS_ONLY',       type: 'bool' },
   { g: 'Physics', k: 'SPRING_STIFFNESS',       min: 1,       max: 200,   step: 1 },
   { g: 'Physics', k: 'SPRING_DAMPING',         min: 0,       max: 20,    step: 0.1 },
   { g: 'Physics', k: 'MAX_BLADE_ANGLE',        min: 0.1,     max: 3,     step: 0.05 },
@@ -52,17 +53,22 @@ export class DebugPanel {
 
   _buildButton() {
     const btn = document.createElement('button');
-    btn.textContent = '🐛';
     btn.title = 'Debug panel';
+    const img = document.createElement('img');
+    img.src = 'src/bug.png';
+    img.width = 20;
+    img.height = 20;
+    img.style.display = 'block';
+    img.style.imageRendering = 'pixelated';
+    btn.appendChild(img);
     Object.assign(btn.style, {
       position:   'fixed',
       bottom:     '12px',
       right:      '12px',
       background: 'none',
       border:     'none',
-      fontSize:   '18px',
       lineHeight: '1',
-      opacity:    '0.25',
+      opacity:    '0.55',
       cursor:     'pointer',
       zIndex:     '1001',
       padding:    '4px',
@@ -121,6 +127,8 @@ export class DebugPanel {
   }
 
   _buildRow(p) {
+    if (p.type === 'bool') return this._buildBoolRow(p);
+
     const row = document.createElement('div');
     Object.assign(row.style, {
       display:             'grid',
@@ -182,6 +190,45 @@ export class DebugPanel {
     row.appendChild(label);
     row.appendChild(numInput);
     row.appendChild(slider);
+    return row;
+  }
+
+  _buildBoolRow(p) {
+    const row = document.createElement('div');
+    Object.assign(row.style, {
+      display:        'flex',
+      alignItems:     'center',
+      justifyContent: 'space-between',
+      marginBottom:   '9px',
+    });
+
+    const label = document.createElement('span');
+    label.textContent = p.k.toLowerCase().replace(/_/g, ' ');
+    Object.assign(label.style, {
+      opacity:      '0.65',
+      fontSize:     '10px',
+      overflow:     'hidden',
+      whiteSpace:   'nowrap',
+      textOverflow: 'ellipsis',
+    });
+
+    const cb = document.createElement('input');
+    cb.type    = 'checkbox';
+    cb.checked = C[p.k];
+    Object.assign(cb.style, {
+      accentColor: '#8a7f5c',
+      cursor:      'pointer',
+      width:       '16px',
+      height:      '16px',
+      flexShrink:  '0',
+    });
+    cb.addEventListener('change', () => {
+      C[p.k] = cb.checked;
+      if (p.rb) this.cbs[p.rb]?.();
+    });
+
+    row.appendChild(label);
+    row.appendChild(cb);
     return row;
   }
 
