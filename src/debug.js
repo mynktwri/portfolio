@@ -77,7 +77,7 @@ export class DebugPanel {
     });
     btn.addEventListener('mouseenter', () => { btn.style.opacity = '0.85'; });
     btn.addEventListener('mouseleave', () => { btn.style.opacity = this.open ? '0.85' : '0.25'; });
-    btn.addEventListener('click', () => this._toggle());
+    btn.addEventListener('click', () => this._open());
     this.btn = btn;
     document.body.appendChild(btn);
   }
@@ -100,7 +100,6 @@ export class DebugPanel {
       transition: 'transform 0.18s ease',
       boxSizing:  'border-box',
       padding:    '10px 10px 48px',
-      position:   'relative',
       borderLeft: '1px solid #8a7f5c55',
     });
 
@@ -118,7 +117,7 @@ export class DebugPanel {
       lineHeight: '1',
       padding:    '2px 4px',
     });
-    closeBtn.addEventListener('click', () => this._toggle());
+    closeBtn.addEventListener('click', () => this._close());
     panel.appendChild(closeBtn);
 
     let currentGroup = null;
@@ -250,9 +249,15 @@ export class DebugPanel {
     return row;
   }
 
-  _toggle() {
-    this.open = !this.open;
-    this.panel.style.transform = this.open ? 'translateX(0)' : 'translateX(100%)';
-    this.btn.style.opacity = this.open ? '0.85' : '0.25';
+  _open() {
+    this.open = true;
+    this.panel.style.transform = 'translateX(0)';
+    this.btn.style.opacity = '0.85';
+  }
+
+  _close() {
+    this.open = false;
+    this.panel.style.transform = 'translateX(100%)';
+    this.btn.style.opacity = '0.25';
   }
 }
