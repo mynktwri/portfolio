@@ -66,8 +66,9 @@ export const CONSTANTS = {
   LINK_CLEARANCE_MARGIN:  8,
 
   // Content panel
-  PANEL_LEFT_OFFSET:  60,
-  PANEL_WIDTH:       280,
-  PANEL_HEIGHT:      220,
+  PANEL_LEFT_OFFSET:       60,
+  PANEL_WIDTH:            280,
+  CONTACT_PANEL_WIDTH:    440,
+  PANEL_HEIGHT:           220,
   CONTACT_ENDPOINT: '/api/contact',
 };

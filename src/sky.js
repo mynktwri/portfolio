@@ -85,7 +85,7 @@ export class SkyLayer {
     this.lastGradientKey = null;
     // debug override: ?hour=21.5 freezes the time-of-day for previewing phases
     const hourParam = new URLSearchParams(window.location.search).get('hour');
-    this.hourOverride = hourParam !== null ? parseFloat(hourParam) : null;
+    this.hourOverride = hourParam !== null ? parseFloat(hourParam) : 21;
   }
 
   init() {

@@ -85,8 +85,9 @@ export class ContentPanel {
 
     const RIGHT_MARGIN  = 16;
     const BOTTOM_MARGIN = 16;
+    const targetW    = this.currentSection === 'contact' ? C.CONTACT_PANEL_WIDTH : C.PANEL_WIDTH;
     const available  = Math.max(0, w - anchor - RIGHT_MARGIN);
-    const panelW     = Math.min(C.PANEL_WIDTH, available);
+    const panelW     = Math.min(targetW, available);
     const panelH     = Math.min(C.PANEL_HEIGHT, h - top - BOTTOM_MARGIN);
     const idealLeft  = Math.round((w - panelW) / 2);
     const left       = Math.max(anchor, Math.min(idealLeft, w - panelW - RIGHT_MARGIN));
@@ -112,6 +113,12 @@ export class ContentPanel {
     for (const btn of this.el.querySelectorAll('button:not([data-close])')) {
       btn.style.color       = hexColor(C.FG_TONE);
       btn.style.borderColor = hexColor(C.FG_TONE);
+    }
+    for (const a of this.el.querySelectorAll('a')) {
+      a.style.color = hexColor(C.FG_TONE);
+    }
+    for (const el of this.el.querySelectorAll('[data-muted]')) {
+      el.style.color = hexColor(C.MID_TONE);
     }
   }
 
@@ -165,7 +172,9 @@ export class ContentPanel {
       this.content.appendChild(img);
 
       const text = document.createElement('p');
-      text.textContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.';
+
+      text.textContent = 'PLACEHOLDER';
+      
       Object.assign(text.style, { margin: '0', lineHeight: '1.6' });
       this.content.appendChild(text);
     } else if (section === 'projects') {
@@ -233,7 +242,50 @@ export class ContentPanel {
       });
       form.appendChild(submit);
 
-      this.content.appendChild(form);
+      const row = document.createElement('div');
+      Object.assign(row.style, { display: 'flex', gap: '16px', alignItems: 'flex-start' });
+
+      form.style.flexShrink = '0';
+      form.style.width = '240px';
+
+      const aside = document.createElement('div');
+      Object.assign(aside.style, {
+        flexShrink:    '0',
+        width:         '152px',
+        paddingTop:    '2px',
+        fontFamily:    'monospace',
+        fontSize:      '11px',
+        letterSpacing: '1px',
+        lineHeight:    '1.5',
+      });
+
+      const asideLabel = document.createElement('div');
+      asideLabel.setAttribute('data-muted', '');
+      asideLabel.textContent = 'or schedule time with me:';
+      Object.assign(asideLabel.style, { marginBottom: '8px', color: hexColor(C.MID_TONE) });
+
+      const calLink = document.createElement('a');
+      calLink.href = 'https://calendly.com/twri-mynk/coffee-chat';
+      calLink.target = '_blank';
+      calLink.rel = 'noopener noreferrer';
+      calLink.textContent = '[ coffee chat → ]';
+      Object.assign(calLink.style, {
+        display:       'inline-block',
+        color:         hexColor(C.FG_TONE),
+        textDecoration: 'none',
+        fontFamily:    'monospace',
+        fontSize:      '11px',
+        letterSpacing: '1px',
+      });
+      calLink.addEventListener('mouseenter', () => { calLink.style.color = hexColor(C.MID_TONE); });
+      calLink.addEventListener('mouseleave', () => { calLink.style.color = hexColor(C.FG_TONE); });
+
+      aside.appendChild(asideLabel);
+      aside.appendChild(calLink);
+
+      row.appendChild(form);
+      row.appendChild(aside);
+      this.content.appendChild(row);
     }
   }
 }
