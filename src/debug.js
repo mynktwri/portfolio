@@ -98,11 +98,12 @@ export class DebugPanel {
       fontSize:   '11px',
       overflowY:  'auto',
       zIndex:     '1000',
-      transform:  'translateX(100%)',
-      transition: 'transform 0.18s ease',
-      boxSizing:  'border-box',
-      padding:    '10px 10px 48px',
-      borderLeft: '1px solid #8a7f5c55',
+      transform:     'translateX(100%)',
+      transition:    'transform 0.18s ease',
+      boxSizing:     'border-box',
+      padding:       '10px 10px 48px',
+      borderLeft:    '1px solid #8a7f5c55',
+      pointerEvents: 'none',
     });
 
     const closeBtn = document.createElement('button');
@@ -253,13 +254,15 @@ export class DebugPanel {
 
   _open() {
     this.open = true;
-    this.panel.style.transform = 'translateX(0)';
-    this.btn.style.opacity = '0.85';
+    this.panel.style.transform     = 'translateX(0)';
+    this.panel.style.pointerEvents = 'auto';
+    this.btn.style.opacity         = '0.85';
   }
 
   _close() {
     this.open = false;
-    this.panel.style.transform = 'translateX(100%)';
-    this.btn.style.opacity = '0.25';
+    this.panel.style.transform     = 'translateX(100%)';
+    this.panel.style.pointerEvents = 'none';
+    this.btn.style.opacity         = '0.25';
   }
 }

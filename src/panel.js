@@ -81,17 +81,20 @@ export class ContentPanel {
     const top = Math.round(h * (C.SKY_FRACTION + C.LINK_TOP_FRACTION));
 
     const BOTTOM_MARGIN = 16;
-    const panelW = Math.round(w / 3);
-    const panelH = h - top - BOTTOM_MARGIN;
-    const left   = Math.round(w / 3);
+    const panelH   = h - top - BOTTOM_MARGIN;
+    const panelW   = panelH / 1.5;
+
+    const navRight = this.leftEdge ?? Math.round(w * C.LINK_LEFT_FRACTION);
+    const centered = Math.round((w - panelW) / 2);
+    const left     = Math.max(navRight + C.NAV_PANEL_GAP_MIN, centered);
 
     this.el.style.left      = left   + 'px';
     this.el.style.top       = top    + 'px';
-    this.el.style.width     = panelW + 'px';
     this.el.style.maxHeight = panelH + 'px';
+    this.el.style.width     = panelW + 'px';
 
     if (this.el.style.display !== 'none') {
-      this.grass.registerClearanceRect(left, top, panelW, panelH, 'panel');
+      this.grass.registerClearanceRect(left, top, panelW, this.el.offsetHeight, 'panel');
     }
   }
 
@@ -154,17 +157,57 @@ export class ContentPanel {
     this.content.appendChild(heading);
 
     if (section === 'about') {
-      const text = document.createElement('p');
+      const row = document.createElement('div');
+      Object.assign(row.style, {
+        display:    'flex',
+        gap:        '16px',
+        alignItems: 'flex-start',
+      });
 
-      text.textContent = 'Mayank Tiwari is a software engineer with 6+ years of expertise in software development and AI. His previous work includes leading the AI team at e.l.f. Beauty, Inc., DevOps at Walmart, and backend at ServiceTitan. In his free time he enjoys many different genres of video games, espressos with his two cats, and spending time in the wilderness. He is passionate about community, responsible technology, and sustainability.';
-      
-      Object.assign(text.style, { margin: '0', lineHeight: '1.6' });
-      this.content.appendChild(text);
-    } else if (section === 'projects') {
       const text = document.createElement('p');
-      text.textContent = 'Projects coming soon.';
-      Object.assign(text.style, { margin: '0' });
-      this.content.appendChild(text);
+      text.textContent = 'Mayank Tiwari is a software engineer with 6+ years of expertise in software development and AI. His previous work includes leading the AI team at e.l.f. Beauty, Inc., DevOps at Walmart, and backend at ServiceTitan. In his free time he enjoys many different genres of video games, espressos with his two cats, and spending time in the wilderness. He is passionate about community, responsible technology, and sustainability.';
+      Object.assign(text.style, { margin: '0', lineHeight: '1.6', flex: '1 1 0', minWidth: '0' });
+
+      const avatar = document.createElement('img');
+      avatar.src = 'src/headshot.jpg';
+      avatar.alt = 'Headshot';
+      Object.assign(avatar.style, {
+        flexShrink:   '0',
+        width:        '90px',
+        height:       '90px',
+        borderRadius: '50%',
+        objectFit:    'cover',
+        objectPosition: 'center top',
+        border:       '2px solid ' + hexColor(C.MID_TONE),
+        display:      'block',
+      });
+
+      row.appendChild(text);
+      row.appendChild(avatar);
+      this.content.appendChild(row);
+    } else if (section === 'projects') {
+      const ghLink = document.createElement('a');
+      ghLink.href = 'https://github.com/mynktwri';
+      ghLink.target = '_blank';
+      ghLink.rel = 'noopener noreferrer';
+      ghLink.textContent = '[ github.com/mynktwri ]';
+      Object.assign(ghLink.style, {
+        display:        'inline-block',
+        color:          hexColor(C.FG_TONE),
+        textDecoration: 'none',
+        fontFamily:     'monospace',
+        fontSize:       '12px',
+        letterSpacing:  '1px',
+        marginBottom:   '10px',
+      });
+      ghLink.addEventListener('mouseenter', () => { ghLink.style.color = hexColor(C.MID_TONE); });
+      ghLink.addEventListener('mouseleave', () => { ghLink.style.color = hexColor(C.FG_TONE); });
+      this.content.appendChild(ghLink);
+
+      const soon = document.createElement('p');
+      soon.textContent = 'More coming soon!';
+      Object.assign(soon.style, { margin: '0', color: hexColor(C.MID_TONE) });
+      this.content.appendChild(soon);
     } else if (section === 'contact') {
       const form = document.createElement('form');
 

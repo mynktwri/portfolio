@@ -59,7 +59,7 @@ export const CONSTANTS = {
   CLOUD_SPEED_MAX:       0.25,
 
   // Nav links
-  LINK_LEFT_FRACTION:  0.20,  // stack sits this far from the left edge
+  LINK_LEFT_FRACTION:  0.15,  // stack sits this far from the left edge
   LINK_TOP_FRACTION:   0.05,  // stack starts this far below the horizon line
   LINK_VERTICAL_SPACING: 28,  // px between stacked link tops
   LINK_SPACING:          80,  // px between link centers
@@ -68,6 +68,7 @@ export const CONSTANTS = {
   LINK_CLEARANCE_MARGIN:  8,
 
   // Content panel
+  NAV_PANEL_GAP_MIN:       20,  // minimum px of grass visible between nav links and panel
   PANEL_LEFT_OFFSET:       60,
   PANEL_WIDTH:            280,
   CONTACT_PANEL_WIDTH:    440,
