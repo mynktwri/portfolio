@@ -17,7 +17,7 @@ export const CONSTANTS = {
   GRASS_ROW_SPACING:     8,    // px between field rows
   BLADE_SPACING_MIN:     4,    // spacing never shrinks below this on small screens
   GRASS_ROW_SPACING_MIN: 8,    // row spacing never shrinks below this on small screens
-  GRASS_JITTER:          3.5,    // ± random offset per blade root
+  GRASS_JITTER:          7,    // ± random offset per blade root
   GRASS_MAX_BLADES:  20000,    // spacing widens on huge screens to stay under this
   CLEARANCE_SCALE:       1,  // invisible outline-suppression zone scale
   GRASS_OUTLINE_GAP:     10.5,    // px tip separation before a blade edge is drawn
@@ -42,7 +42,7 @@ export const CONSTANTS = {
   WAVE_SPATIAL_FREQ:      0.011,   // rad/px along wind axis — lower = wider waves
   WAVE_TIME_RATE:         0.00088, // rad/ms — wave-front travel speed
   TURB_SPATIAL_FREQ:      0.001,   // rad/px perpendicular — lower = broader turbulence
-  TURB_TIME_RATE:         0.00003, // rad/ms — turbulence oscillation speed
+  TURB_TIME_RATE:         0.0006, // rad/ms — turbulence oscillation speed
   TURB_AMOUNT:            2.9,     // max phase shift from turbulence (radians)
 
   // Wind — gusts

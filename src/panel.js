@@ -76,26 +76,19 @@ export class ContentPanel {
   }
 
   reposition() {
-    const w = this.app.screen.width;
-    const h = this.app.screen.height;
-    const navX   = Math.round(w * C.LINK_LEFT_FRACTION);
-    const navY   = Math.round(h * (C.SKY_FRACTION + C.LINK_TOP_FRACTION));
-    const anchor = this.leftEdge ?? (navX + C.PANEL_LEFT_OFFSET);
-    const top    = navY;
+    const w   = this.app.screen.width;
+    const h   = this.app.screen.height;
+    const top = Math.round(h * (C.SKY_FRACTION + C.LINK_TOP_FRACTION));
 
-    const RIGHT_MARGIN  = 16;
     const BOTTOM_MARGIN = 16;
-    const targetW    = this.currentSection === 'contact' ? C.CONTACT_PANEL_WIDTH : C.PANEL_WIDTH;
-    const available  = Math.max(0, w - anchor - RIGHT_MARGIN);
-    const panelW     = Math.min(targetW, available);
-    const panelH     = Math.min(C.PANEL_HEIGHT, h - top - BOTTOM_MARGIN);
-    const idealLeft  = Math.round((w - panelW) / 2);
-    const left       = Math.max(anchor, Math.min(idealLeft, w - panelW - RIGHT_MARGIN));
+    const panelW = Math.round(w / 3);
+    const panelH = h - top - BOTTOM_MARGIN;
+    const left   = Math.round(w / 3);
 
-    this.el.style.left      = left    + 'px';
-    this.el.style.top       = top     + 'px';
-    this.el.style.width     = panelW  + 'px';
-    this.el.style.maxHeight = panelH  + 'px';
+    this.el.style.left      = left   + 'px';
+    this.el.style.top       = top    + 'px';
+    this.el.style.width     = panelW + 'px';
+    this.el.style.maxHeight = panelH + 'px';
 
     if (this.el.style.display !== 'none') {
       this.grass.registerClearanceRect(left, top, panelW, panelH, 'panel');
@@ -161,19 +154,6 @@ export class ContentPanel {
     this.content.appendChild(heading);
 
     if (section === 'about') {
-      const img = document.createElement('img');
-      img.src = 'src/banner2.jpeg';
-      img.alt = '';
-      Object.assign(img.style, {
-        width:        '100%',
-        height:       '70px',
-        objectFit:    'cover',
-        objectPosition: 'center',
-        display:      'block',
-        marginBottom: '8px',
-      });
-      this.content.appendChild(img);
-
       const text = document.createElement('p');
 
       text.textContent = 'Mayank Tiwari is a software engineer with 6+ years of expertise in software development and AI. His previous work includes leading the AI team at e.l.f. Beauty, Inc., DevOps at Walmart, and backend at ServiceTitan. In his free time he enjoys many different genres of video games, espressos with his two cats, and spending time in the wilderness. He is passionate about community, responsible technology, and sustainability.';
@@ -248,8 +228,8 @@ export class ContentPanel {
       const row = document.createElement('div');
       Object.assign(row.style, { display: 'flex', gap: '16px', alignItems: 'flex-start' });
 
-      form.style.flexShrink = '0';
-      form.style.width = '240px';
+      form.style.flex = '1 1 0';
+      form.style.minWidth = '0';
 
       const aside = document.createElement('div');
       Object.assign(aside.style, {
