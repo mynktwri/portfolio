@@ -1,7 +1,7 @@
 export const CONSTANTS = {
-  // Palette
-  BG_TONE:   0xEBE3CE,
-  FG_TONE:   0x000000,
+  // Palette (dark mode only)
+  BG_TONE:   0x1C1A14,
+  FG_TONE:   0xEBE3CE,
   DARK_TONE: 0x2D2A1E,
   MID_TONE:  0x8A7F5C,
 

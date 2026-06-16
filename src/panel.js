@@ -161,13 +161,16 @@ export class ContentPanel {
     this.content.appendChild(heading);
 
     if (section === 'about') {
-      const img = document.createElement('div');
+      const img = document.createElement('img');
+      img.src = 'src/banner2.jpeg';
+      img.alt = '';
       Object.assign(img.style, {
         width:        '100%',
         height:       '70px',
-        background:   hexColor(C.MID_TONE),
+        objectFit:    'cover',
+        objectPosition: 'center',
+        display:      'block',
         marginBottom: '8px',
-        imageRendering: 'pixelated',
       });
       this.content.appendChild(img);
 
