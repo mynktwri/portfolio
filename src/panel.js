@@ -160,7 +160,7 @@ export class ContentPanel {
     });
     this.content.appendChild(heading);
 
-    if (section === 'about') {
+    if (section === 'about') 
       const img = document.createElement('div');
       Object.assign(img.style, {
         width:        '100%',
@@ -173,11 +173,11 @@ export class ContentPanel {
 
       const text = document.createElement('p');
 
-      text.textContent = 'PLACEHOLDER';
+      text.textContent = 'Mayank Tiwari is a software engineer with 6+ years of expertise in software development and AI. His previous work includes leading the AI team at e.l.f. Beauty, Inc., DevOps at Walmart, and backend at ServiceTitan. In his free time he enjoys many different genres of video games, espressos with his two cats, and spending time in the wilderness. He is passionate about community, responsible technology, and sustainability.';
       
       Object.assign(text.style, { margin: '0', lineHeight: '1.6' });
       this.content.appendChild(text);
-    } else if (section === 'projects') {
+     else if (section === 'projects') {
       const text = document.createElement('p');
       text.textContent = 'Projects coming soon.';
       Object.assign(text.style, { margin: '0' });
