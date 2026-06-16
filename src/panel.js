@@ -160,7 +160,7 @@ export class ContentPanel {
     });
     this.content.appendChild(heading);
 
-    if (section === 'about') 
+    if (section === 'about') {
       const img = document.createElement('div');
       Object.assign(img.style, {
         width:        '100%',
@@ -177,7 +177,7 @@ export class ContentPanel {
       
       Object.assign(text.style, { margin: '0', lineHeight: '1.6' });
       this.content.appendChild(text);
-     else if (section === 'projects') {
+    } else if (section === 'projects') {
       const text = document.createElement('p');
       text.textContent = 'Projects coming soon.';
       Object.assign(text.style, { margin: '0' });
