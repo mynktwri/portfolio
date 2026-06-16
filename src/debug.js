@@ -4,7 +4,7 @@ import { CONSTANTS as C } from './constants.js';
 const PARAMS = [
   { g: 'Grass',   k: 'BLADE_HEIGHT',          min: 5,       max: 40,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'BLADE_BASE_WIDTH',       min: 1,       max: 8,     step: 1,       rb: 'grass' },
-  { g: 'Grass',   k: 'BLADE_TIP_WIDTH',        min: 0,       max: 4,     step: 1,       rb: 'grass' },
+  { g: 'Grass',   k: 'BLADE_TIP_WIDTH',        min: 0,       max: 12,     step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'BLADE_SPACING',          min: 1,       max: 20,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_ROW_SPACING',      min: 3,       max: 30,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_JITTER',           min: 0,       max: 10,    step: 0.5,     rb: 'grass' },
@@ -79,7 +79,7 @@ export class DebugPanel {
     });
     btn.addEventListener('mouseenter', () => { btn.style.opacity = '0.85'; });
     btn.addEventListener('mouseleave', () => { btn.style.opacity = this.open ? '0.85' : '0.25'; });
-    btn.addEventListener('click', () => this._toggle());
+    btn.addEventListener('click', () => this._open());
     this.btn = btn;
     document.body.appendChild(btn);
   }
@@ -104,6 +104,23 @@ export class DebugPanel {
       padding:    '10px 10px 48px',
       borderLeft: '1px solid #8a7f5c55',
     });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    Object.assign(closeBtn.style, {
+      position:   'absolute',
+      top:        '8px',
+      right:      '10px',
+      background: 'none',
+      border:     'none',
+      color:      '#8a7f5c',
+      fontSize:   '14px',
+      cursor:     'pointer',
+      lineHeight: '1',
+      padding:    '2px 4px',
+    });
+    closeBtn.addEventListener('click', () => this._close());
+    panel.appendChild(closeBtn);
 
     let currentGroup = null;
     for (const p of PARAMS) {
@@ -234,9 +251,15 @@ export class DebugPanel {
     return row;
   }
 
-  _toggle() {
-    this.open = !this.open;
-    this.panel.style.transform = this.open ? 'translateX(0)' : 'translateX(100%)';
-    this.btn.style.opacity = this.open ? '0.85' : '0.25';
+  _open() {
+    this.open = true;
+    this.panel.style.transform = 'translateX(0)';
+    this.btn.style.opacity = '0.85';
+  }
+
+  _close() {
+    this.open = false;
+    this.panel.style.transform = 'translateX(100%)';
+    this.btn.style.opacity = '0.25';
   }
 }

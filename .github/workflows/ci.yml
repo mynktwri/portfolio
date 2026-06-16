@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Cancel any in-progress run for the same ref so a broken push
+# can't sneak through while an older smoke test is still running.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── 1. Smoke test ──────────────────────────────────────────────────────────
+  smoke:
+    name: Smoke test (headless Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium --with-deps
+
+      - name: Start static server
+        run: npx --yes serve -l 3000 &
+
+      - name: Wait for server
+        run: |
+          echo "Waiting for localhost:3000..."
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:3000 > /dev/null && echo "Ready." && break
+            sleep 1
+          done
+
+      - name: Run smoke test
+        run: node .github/scripts/smoke.mjs
+
+      # Always upload the screenshot so you can inspect what the page
+      # looked like even when (especially when) the test fails.
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-${{ github.sha }}
+          path: screenshot.png
+          retention-days: 14
+
+  # ── 2. Deploy (only if smoke passes) ───────────────────────────────────────
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: smoke
+    # Skip deploy on PRs — only push to main triggers a real deployment.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - uses: actions/deploy-pages@v4
+        id: deployment

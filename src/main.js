@@ -1,18 +1,14 @@
 import { Application } from 'pixi.js';
 import { CONSTANTS as C } from './constants.js';
-import { applyTheme } from './theme.js';
+import { hexColor } from './theme.js';
+import { ContentPanel } from './panel.js';
 import { SkyLayer } from './sky.js';
 import { WindSimulator } from './wind.js';
 import { GrassField } from './grass.js';
 import { NavLinks } from './links.js';
-import { DarkModeToggle } from './toggle.js';
 import { DebugPanel } from './debug.js';
 
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-if (prefersDark) {
-  applyTheme(true);
-  document.body.style.background = '#' + C.BG_TONE.toString(16).padStart(6, '0');
-}
+document.body.style.background = hexColor(C.BG_TONE);
 
 const app = new Application();
 await app.init({
@@ -28,33 +24,23 @@ document.body.appendChild(app.canvas);
 const wind = new WindSimulator();
 const sky = new SkyLayer(app);
 const grass = new GrassField(app, wind);
-const links = new NavLinks(app, grass);
-const toggle = new DarkModeToggle(app, (dark) => {
-  applyTheme(dark);
-  app.renderer.background.color = C.BG_TONE;
-  document.body.style.background = '#' + C.BG_TONE.toString(16).padStart(6, '0');
-  sky.rebuild();
-  grass.rebuild();
-  links.reposition();
-  links.updateColors();
-  toggle.updateColors();
-  toggle.reposition();
-}, prefersDark);
+const panel = new ContentPanel(app, grass);
+const links = new NavLinks(app, grass, panel);
 
-const rebuildGrass = () => { grass.rebuild(); links.reposition(); toggle.reposition(); };
+const rebuildGrass = () => { grass.rebuild(); links.reposition(); panel.reposition(); };
 const rebuildSky   = () => { sky.rebuild(); };
-const rebuildFull  = () => { sky.rebuild(); grass.rebuild(); links.reposition(); toggle.reposition(); };
+const rebuildFull  = () => { sky.rebuild(); grass.rebuild(); links.reposition(); panel.reposition(); };
 
 const debug = new DebugPanel({ grass: rebuildGrass, sky: rebuildSky, full: rebuildFull });
 
 sky.init();
 grass.init();
+panel.init();
 links.init();
-toggle.init();
 debug.init();
 
-// z-order: sky 0, grass 1, links 2, toggle 3
-app.stage.addChild(sky.container, grass.container, links.container, toggle.container);
+// z-order: sky 0, grass 1, links 2
+app.stage.addChild(sky.container, grass.container, links.container);
 
 app.ticker.add((ticker) => {
   wind.update(ticker.deltaMS, app.screen.width);
@@ -78,7 +64,7 @@ app.renderer.on('resize', () => {
   sky.rebuild();
   grass.rebuild();
   links.reposition();
-  toggle.reposition();
+  panel.reposition();
 });
 
 let lastX = 0;

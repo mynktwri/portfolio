@@ -5,19 +5,20 @@ const LINKS = [
   { label: 'About',    href: '#about' },
   { label: 'Projects', href: '#projects' },
   { label: 'Contact',  href: '#contact' },
-  { label: 'Resume',   href: '/resume.pdf' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/mynktwri', external: true },
 ];
 
 export class NavLinks {
-  constructor(app, grassField) {
+  constructor(app, grassField, panel) {
     this.app = app;
     this.grass = grassField;
+    this.panel = panel;
     this.container = new Container();
     this.texts = [];
   }
 
   init() {
-    for (const { label, href } of LINKS) {
+    for (const { label, href, external } of LINKS) {
       const text = new Text({
         text: label,
         style: {
@@ -32,7 +33,10 @@ export class NavLinks {
       text.cursor = 'pointer';
       text.on('pointerover', () => { text.style.fill = C.MID_TONE; });
       text.on('pointerout', () => { text.style.fill = C.FG_TONE; });
-      text.on('pointerup', () => { window.location.href = href; });
+      text.on('pointerup', () => {
+        if (external) { window.open(href, '_blank', 'noopener'); }
+        else { this.panel.open(href.replace('#', '')); }
+      });
       this.texts.push(text);
       this.container.addChild(text);
     }
@@ -51,13 +55,16 @@ export class NavLinks {
     // stack starts LINK_TOP_FRACTION below the horizon line
     let y = Math.round(h * (C.SKY_FRACTION + C.LINK_TOP_FRACTION));
 
+    let maxRight = 0;
     for (const t of this.texts) {
       t.x = x;
       t.y = y;
       this.grass.registerClearanceRect(
         t.x - margin, t.y - margin, t.width + margin * 2, t.height + margin * 2,
       );
+      maxRight = Math.max(maxRight, t.x + t.width + margin);
       y += C.LINK_VERTICAL_SPACING;
     }
+    this.panel.leftEdge = maxRight;
   }
 }
