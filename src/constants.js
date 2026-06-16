@@ -12,7 +12,7 @@ export const CONSTANTS = {
   // Grass
   BLADE_HEIGHT:         17,    // px at 1x
   BLADE_BASE_WIDTH:      1,
-  BLADE_TIP_WIDTH:       5,
+  BLADE_TIP_WIDTH:       8,
   BLADE_SPACING:         4,    // px between blade roots within a row
   GRASS_ROW_SPACING:     8,    // px between field rows
   BLADE_SPACING_MIN:     4,    // spacing never shrinks below this on small screens
@@ -64,4 +64,10 @@ export const CONSTANTS = {
   LINK_FONT_SIZE:        12,
   LINK_LETTER_SPACING:    2,
   LINK_CLEARANCE_MARGIN:  8,
+
+  // Content panel
+  PANEL_LEFT_OFFSET:  60,
+  PANEL_WIDTH:       280,
+  PANEL_HEIGHT:      220,
+  CONTACT_ENDPOINT: '/api/contact',
 };

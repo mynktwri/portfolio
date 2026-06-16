@@ -1,5 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 import { CONSTANTS as C } from './constants.js';
+import { isDark } from './theme.js';
 
 const CLEARANCE_SIM_MARGIN = 4; // extra px around registered rects
 
@@ -75,14 +76,17 @@ export class GrassField {
     this.build();
   }
 
-  registerClearanceRect(x, y, w, h) {
-    this.clearanceRects.push({
-      x: x - CLEARANCE_SIM_MARGIN,
-      y: y - CLEARANCE_SIM_MARGIN,
-      w: w + CLEARANCE_SIM_MARGIN * 2,
-      h: h + CLEARANCE_SIM_MARGIN * 2,
-    });
+  registerClearanceRect(x, y, w, h, id = null) {
+    if (id !== null) this.clearanceRects = this.clearanceRects.filter(r => r.id !== id);
+    const m = CLEARANCE_SIM_MARGIN;
+    this.clearanceRects.push({ id, x: x - m, y: y - m, w: w + m * 2, h: h + m * 2 });
     this.applyClearance();
+  }
+
+  unregisterClearanceRect(id) {
+    const before = this.clearanceRects.length;
+    this.clearanceRects = this.clearanceRects.filter(r => r.id !== id);
+    if (this.clearanceRects.length !== before) this.applyClearance();
   }
 
   applyClearance() {
@@ -239,6 +243,9 @@ export class GrassField {
       }
       g.moveTo(tlx, tly).lineTo(trx, try_); // tip cap always drawn on exposed blades
     }
-    g.stroke({ width: 1, color: C.FG_TONE, pixelLine: true });
+    g.stroke(isDark
+      ? { width: 1, color: C.FG_TONE, pixelLine: true }
+      : { width: 3, color: C.FG_TONE });
+
   }
 }

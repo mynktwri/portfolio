@@ -4,7 +4,7 @@ import { CONSTANTS as C } from './constants.js';
 const PARAMS = [
   { g: 'Grass',   k: 'BLADE_HEIGHT',          min: 5,       max: 40,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'BLADE_BASE_WIDTH',       min: 1,       max: 8,     step: 1,       rb: 'grass' },
-  { g: 'Grass',   k: 'BLADE_TIP_WIDTH',        min: 0,       max: 4,     step: 1,       rb: 'grass' },
+  { g: 'Grass',   k: 'BLADE_TIP_WIDTH',        min: 0,       max: 12,     step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'BLADE_SPACING',          min: 1,       max: 20,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_ROW_SPACING',      min: 3,       max: 30,    step: 1,       rb: 'grass' },
   { g: 'Grass',   k: 'GRASS_JITTER',           min: 0,       max: 10,    step: 0.5,     rb: 'grass' },

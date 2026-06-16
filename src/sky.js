@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite, Texture } from 'pixi.js';
 import { CONSTANTS as C } from './constants.js';
 
 // Read C dynamically so theme changes are reflected without a module reload.
@@ -11,8 +11,14 @@ function phaseColors(t) {
 
 const PHASE_BOUNDARIES = [4, 7, 17, 20];
 
-const GRADIENT_BANDS = 6;
-const DITHER_CELL = 4;
+const DITHER_PIXEL_SIZE = 7;
+
+const BAYER_4 = [
+  [ 0,  8,  2, 10],
+  [12,  4, 14,  6],
+  [ 3, 11,  1,  9],
+  [15,  7, 13,  5],
+];
 const ORB_RADIUS = 14;
 const ORB_Y_FRACTION = 0.06;
 const HALO_ARM = 4;
@@ -70,7 +76,9 @@ export class SkyLayer {
   constructor(app) {
     this.app = app;
     this.container = new Container();
-    this.gradient = new Graphics();
+    this.gradientCanvas  = null;
+    this.gradientTexture = null;
+    this.gradientSprite  = null;
     this.cloudLayer = new Container();
     this.orb = new Container();
     this.clouds = [];
@@ -81,17 +89,34 @@ export class SkyLayer {
   }
 
   init() {
-    this.container.addChild(this.gradient, this.cloudLayer, this.orb);
+    this._initGradient();
+    this.container.addChild(this.cloudLayer, this.orb);
     this.buildOrb();
     this.buildClouds();
   }
 
   rebuild() {
     this.lastGradientKey = null;
+    this._initGradient();
     this.buildOrb();
     this.cloudLayer.removeChildren();
     this.clouds = [];
     this.buildClouds();
+  }
+
+  _initGradient() {
+    if (this.gradientSprite) {
+      this.container.removeChild(this.gradientSprite);
+      this.gradientTexture.destroy(true);
+    }
+    const w    = this.app.screen.width;
+    const skyH = Math.round(this.app.screen.height * C.SKY_FRACTION);
+    this.gradientCanvas        = document.createElement('canvas');
+    this.gradientCanvas.width  = w;
+    this.gradientCanvas.height = skyH;
+    this.gradientTexture       = Texture.from(this.gradientCanvas);
+    this.gradientSprite        = new Sprite(this.gradientTexture);
+    this.container.addChildAt(this.gradientSprite, 0);
   }
 
   buildOrb() {
@@ -145,32 +170,32 @@ export class SkyLayer {
   }
 
   drawGradient(skyColor, horizonColor) {
-    const g = this.gradient;
-    const w = this.app.screen.width;
-    const skyH = Math.round(this.app.screen.height * C.SKY_FRACTION);
-    const bandH = skyH / GRADIENT_BANDS;
+    const canvas = this.gradientCanvas;
+    const w = canvas.width, h = canvas.height;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(w, h);
+    const data = imageData.data;
 
-    g.clear();
-    for (let i = 0; i < GRADIENT_BANDS; i++) {
-      const color = lerpColor(skyColor, horizonColor, i / (GRADIENT_BANDS - 1));
-      g.rect(0, Math.round(i * bandH), w, Math.ceil(bandH)).fill(color);
-    }
-    // checkerboard dither rows straddling each band boundary
-    if (skyColor !== horizonColor) {
-      for (let i = 0; i < GRADIENT_BANDS - 1; i++) {
-        const upper = lerpColor(skyColor, horizonColor, i / (GRADIENT_BANDS - 1));
-        const lower = lerpColor(skyColor, horizonColor, (i + 1) / (GRADIENT_BANDS - 1));
-        if (upper === lower) continue;
-        const y = Math.round((i + 1) * bandH);
-        for (let x = 0, k = 0; x < w; x += DITHER_CELL, k++) {
-          if (k % 2 === 0) {
-            g.rect(x, y - DITHER_CELL, DITHER_CELL, DITHER_CELL).fill(lower);
-          } else {
-            g.rect(x, y, DITHER_CELL, DITHER_CELL).fill(upper);
-          }
-        }
+    const sR = (skyColor >> 16) & 255, sG = (skyColor >> 8) & 255, sB = skyColor & 255;
+    const hR = (horizonColor >> 16) & 255, hG = (horizonColor >> 8) & 255, hB = horizonColor & 255;
+
+    for (let y = 0; y < h; y++) {
+      const t = h <= 1 ? 0 : y / (h - 1);
+      const eR = sR + (hR - sR) * t;
+      const eG = sG + (hG - sG) * t;
+      const eB = sB + (hB - sB) * t;
+      const bRow = BAYER_4[(y / DITHER_PIXEL_SIZE | 0) & 3];
+      for (let x = 0; x < w; x++) {
+        const thr = bRow[(x / DITHER_PIXEL_SIZE | 0) & 3] / 16;
+        const idx = (y * w + x) << 2;
+        data[idx]     = Math.floor(eR) + (eR % 1 > thr ? 1 : 0);
+        data[idx + 1] = Math.floor(eG) + (eG % 1 > thr ? 1 : 0);
+        data[idx + 2] = Math.floor(eB) + (eB % 1 > thr ? 1 : 0);
+        data[idx + 3] = 255;
       }
     }
+    ctx.putImageData(imageData, 0, 0);
+    this.gradientTexture.source.update();
   }
 
   update(deltaMS) {

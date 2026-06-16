@@ -16,6 +16,10 @@ const DARK = {
 
 export let isDark = false;
 
+export function hexColor(tone) {
+  return '#' + tone.toString(16).padStart(6, '0');
+}
+
 export function applyTheme(dark) {
   isDark = dark;
   const p = dark ? DARK : LIGHT;
